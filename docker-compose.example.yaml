@@ -1,0 +1,9 @@
+services:
+  generai:
+    image: generai:latest
+    volumes:
+      - ./generai-data:/app/src/data
+    ports:
+      - "8088:8088"
+    depends_on:
+      - db

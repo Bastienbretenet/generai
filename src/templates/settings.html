@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GenerAI</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
+        integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+    <div class="settings-card">
+        <div class="main-header">
+            <h2 class="settings-title">[ SETTINGS ]</h2>
+            <a class="back-link" href="/">&#8592; Back</a>
+        </div>
+
+        <section class="settings-section">
+            <label class="settings-label">Database</label>
+            <div class="provider-card">
+                <div class="db-grid">
+                    <div class="settings-section" style="grid-column: span 2;">
+                        <label class="settings-label" for="db_type">Type</label>
+                        <select name="db_type" id="db_type">
+                            {% for key, db in db_types.items() %}
+                                <option value="{{ key }}" {% if saved.db_type == key %}selected{% endif %}>
+                                    {{ db.label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="settings-section">
+                        <label class="settings-label" for="db_host">Host</label>
+                        <input type="text" name="db_host" id="db_host" value="{{ saved.db_host }}" placeholder="localhost">
+                    </div>
+                    <div class="settings-section">
+                        <label class="settings-label" for="db_port">Port</label>
+                        <input type="text" name="db_port" id="db_port" value="{{ saved.db_port }}" placeholder="5432">
+                    </div>
+                    <div class="settings-section">
+                        <label class="settings-label" for="db_name">Name</label>
+                        <input type="text" name="db_name" id="db_name" value="{{ saved.db_name }}" placeholder="mydb">
+                    </div>
+                    <div class="settings-section">
+                        <label class="settings-label" for="db_user">User</label>
+                        <input type="text" name="db_user" id="db_user" value="{{ saved.db_user }}" placeholder="postgres">
+                    </div>
+                    <div class="settings-section" style="grid-column: span 2;">
+                        <label class="settings-label" for="db_password">Password</label>
+                        <input type="password" name="db_password" id="db_password" value="{{ saved.db_password }}" placeholder="••••••••">
+                    </div>
+                </div>
+                <div class="db-test">
+                    <button type="button"
+                        hx-post="/settings/test-db"
+                        hx-target="#db-test-result"
+                        hx-swap="innerHTML"
+                        hx-include="#db_host, #db_port, #db_name, #db_user, #db_password"
+                        class="btn-secondary"
+                    >
+                        Tester la connexion
+                    </button>
+                    <span id="db-test-result"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="settings-section">
+            <label class="settings-label">Generation</label>
+            <div class="provider-card">
+                <div class="db-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <div class="settings-section" style="padding: 0; margin: 0;">
+                        <label class="settings-label" for="hash_method">Hash method</label>
+                        <select name="hash_method" id="hash_method">
+                            {% for key, method in hash_methods.items() %}
+                                <option value="{{ key }}" {% if saved.hash_method == key %}selected{% endif %}>
+                                    {{ method.label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="settings-section" style="padding: 0; margin: 0;">
+                        <label class="settings-label" for="uuid_method">UUID method</label>
+                        <select name="uuid_method" id="uuid_method">
+                            {% for key, method in uuid_methods.items() %}
+                                <option value="{{ key }}" {% if saved.uuid_method == key %}selected{% endif %}>
+                                    {{ method.label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="settings-section" style="padding: 0; margin: 0;">
+                        <label class="settings-label" for="password">Password</label>
+                        <input type="password" name="password" id="password" value="{{ saved.password }}" placeholder="Password123!">
+                        {% if saved.password %}
+                            <small class="settings-hint">{{ saved.password }}</small>
+                        {% else %}
+                            <small class="settings-hint">Default: Password123!</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="settings-section">
+            <label class="settings-label">API keys</label>
+            <div class="provider-card">
+                <div class="db-grid" style="grid-template-columns: {% for _ in api_providers %}1fr {% endfor %};">
+                    {% for key, provider in api_providers.items() %}
+                        <div class="settings-section" style="padding: 0; margin: 0; gap: 6px; display: flex; flex-direction: column;">
+                            <div class="provider-header">
+                                <label class="provider-radio">
+                                    <input type="radio" name="provider" value="{{ provider.name }}" {% if saved.provider == provider.name %}checked{% endif %}>
+                                    <span class="provider-name">{{ provider.label }}</span>
+                                </label>
+                                <a class="provider-link" href="{{ provider.lien }}" target="_blank">↗ {{ key }}</a>
+                            </div>
+                            <input type="text" name="{{ provider.name }}" value="{{ saved[provider.name] }}" id="api_provider_{{ provider.name }}" placeholder="{{ provider.placeholder }}">
+                            <select name="{{ provider.name }}_model">
+                                {% for model_key, model_label in provider.models.items() %}
+                                    <option value="{{ model_key }}" {% if saved[provider.name + '_model'] == model_key %}selected{% endif %}>
+                                        {{ model_label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <button
+            hx-post="/settings/save"
+            hx-target="#save-result"
+            hx-include="select, input"
+        >
+            &gt; Save
+        </button>
+        <div id="save-result"></div>
+    </div>
+</body>
+</html>

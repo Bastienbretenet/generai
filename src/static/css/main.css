@@ -1,0 +1,516 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 32px 16px;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    background: #c8b89a;
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0,0,0,0.03) 2px,
+            rgba(0,0,0,0.03) 4px
+        );
+}
+
+/* Cards */
+.main-card,
+.settings-card {
+    background: #e8dcc8;
+    border-top: 3px solid #f5ede0;
+    border-left: 3px solid #f5ede0;
+    border-right: 3px solid #8a7560;
+    border-bottom: 3px solid #8a7560;
+    padding: 0;
+    width: 960px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    box-shadow: 4px 4px 0 #6b5a48, 8px 8px 0 rgba(0,0,0,0.2);
+}
+
+/* Title bar */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #6b5a48 0%, #8a7560 40%, #6b5a48 100%);
+    padding: 6px 10px;
+    border-bottom: 2px solid #4a3d30;
+}
+
+.settings-title {
+    margin: 0;
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    font-weight: normal;
+    color: #f5ede0;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 0 #2a1f14;
+}
+
+.back-link {
+    font-size: 12px;
+    color: #d4c4a8;
+    text-decoration: none;
+    font-family: 'Share Tech Mono', monospace;
+    padding: 2px 8px;
+    background: #8a7560;
+    border-top: 2px solid #a89880;
+    border-left: 2px solid #a89880;
+    border-right: 2px solid #4a3d30;
+    border-bottom: 2px solid #4a3d30;
+}
+
+.back-link:hover {
+    background: #9a8570;
+    color: #f5ede0;
+}
+
+.back-link:active {
+    border-top: 2px solid #4a3d30;
+    border-left: 2px solid #4a3d30;
+    border-right: 2px solid #a89880;
+    border-bottom: 2px solid #a89880;
+}
+
+/* Content area */
+.main-card > *:not(.main-header),
+.settings-card > *:not(.main-header) {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.main-card > *:not(.main-header):first-of-type,
+.settings-card > *:not(.main-header):first-of-type {
+    margin-top: 20px;
+}
+
+.main-card > *:last-child,
+.settings-card > *:last-child {
+    margin-bottom: 20px;
+}
+
+/* Sections */
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: 14px;
+}
+
+.settings-label {
+    font-size: 11px;
+    font-weight: normal;
+    color: #5a4a38;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.settings-hint {
+    font-size: 11px;
+    color: #7a6a58;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+/* Select */
+select {
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    border-top: 2px solid #8a7560;
+    border-left: 2px solid #8a7560;
+    border-right: 2px solid #f5ede0;
+    border-bottom: 2px solid #f5ede0;
+    background: #d8cbb8;
+    color: #2a1f14;
+    cursor: pointer;
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a4a38'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+}
+
+select:focus {
+    outline: 1px dotted #4a3d30;
+    outline-offset: 1px;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="password"],
+textarea {
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    border-top: 2px solid #8a7560;
+    border-left: 2px solid #8a7560;
+    border-right: 2px solid #f5ede0;
+    border-bottom: 2px solid #f5ede0;
+    width: 100%;
+    color: #2a1f14;
+    background: #d8cbb8;
+}
+
+textarea {
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+    outline: 1px dotted #4a3d30;
+    outline-offset: 1px;
+    background: #e0d4c0;
+}
+
+textarea::placeholder {
+    color: #a09080;
+}
+
+input::placeholder {
+    color: #a09080;
+    font-style: italic;
+}
+
+/* DB grid */
+.db-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+}
+
+/* Provider list */
+.provider-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.provider-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px;
+    background: #ddd0b8;
+    border-top: 2px solid #f0e4d0;
+    border-left: 2px solid #f0e4d0;
+    border-right: 2px solid #7a6a58;
+    border-bottom: 2px solid #7a6a58;
+}
+
+.provider-radio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.provider-radio input[type="radio"] {
+    width: auto;
+    accent-color: #4a3d30;
+    cursor: pointer;
+}
+
+.provider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.provider-name {
+    font-size: 13px;
+    font-weight: normal;
+    color: #2a1f14;
+    font-family: 'Share Tech Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.provider-link {
+    font-size: 11px;
+    color: #6a5a48;
+    text-decoration: none;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.provider-link:hover {
+    color: #2a1f14;
+    text-decoration: underline;
+}
+
+/* DB test */
+.db-test {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.btn-secondary {
+    padding: 4px 12px;
+    font-size: 12px;
+    font-family: 'Share Tech Mono', monospace;
+    background: #c8b89a;
+    color: #2a1f14;
+    border-top: 2px solid #e0d0b8;
+    border-left: 2px solid #e0d0b8;
+    border-right: 2px solid #6b5a48;
+    border-bottom: 2px solid #6b5a48;
+    cursor: pointer;
+    align-self: auto;
+    width: auto;
+}
+
+.btn-secondary:hover {
+    background: #d0c0a8;
+}
+
+.btn-secondary:active {
+    border-top: 2px solid #6b5a48;
+    border-left: 2px solid #6b5a48;
+    border-right: 2px solid #e0d0b8;
+    border-bottom: 2px solid #e0d0b8;
+}
+
+/* Status colors */
+.recap-item--ok {
+    background: #c8d8b8;
+    border-color: #a8b898 !important;
+}
+
+.recap-item--ok .recap-value {
+    color: #2a4a1a;
+}
+
+.recap-item--error {
+    background: #d8b8b8;
+    border-color: #b89898 !important;
+}
+
+.recap-item--error .recap-value {
+    color: #4a1a1a;
+}
+
+.test-ok {
+    font-size: 12px;
+    color: #2a4a1a;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.test-error {
+    font-size: 12px;
+    color: #4a1a1a;
+    word-break: break-all;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+/* Recap badges */
+.recap {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: 14px;
+}
+
+.recap-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    background: #d0c0a8;
+    border-top: 2px solid #e4d8c4;
+    border-left: 2px solid #e4d8c4;
+    border-right: 2px solid #7a6a58;
+    border-bottom: 2px solid #7a6a58;
+    font-size: 12px;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.recap-label {
+    color: #6a5a48;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 10px;
+}
+
+.recap-value {
+    color: #2a1f14;
+    font-weight: normal;
+}
+
+/* Notice */
+.notice {
+    font-size: 12px;
+    color: #4a3010;
+    background: #d8c090;
+    border-top: 2px solid #e8d0a0;
+    border-left: 2px solid #e8d0a0;
+    border-right: 2px solid #8a7040;
+    border-bottom: 2px solid #8a7040;
+    padding: 10px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 14px;
+}
+
+.notice a {
+    color: #4a3010;
+    font-weight: normal;
+    text-decoration: underline;
+}
+
+.notice a:hover {
+    color: #2a1800;
+}
+
+input:disabled,
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Main button */
+button:not(.btn-secondary) {
+    padding: 6px 20px;
+    font-size: 13px;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: normal;
+    background: #c8b89a;
+    color: #2a1f14;
+    border-top: 2px solid #e0d0b8;
+    border-left: 2px solid #e0d0b8;
+    border-right: 2px solid #6b5a48;
+    border-bottom: 2px solid #6b5a48;
+    cursor: pointer;
+    align-self: flex-end;
+    width: fit-content;
+    margin-right: 20px;
+    margin-top: 16px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+button:not(.btn-secondary):hover {
+    background: #d0c0a8;
+}
+
+button:not(.btn-secondary):active {
+    border-top: 2px solid #6b5a48;
+    border-left: 2px solid #6b5a48;
+    border-right: 2px solid #e0d0b8;
+    border-bottom: 2px solid #e0d0b8;
+}
+
+/* Save result */
+#save-result {
+    font-size: 12px;
+    font-family: 'Share Tech Mono', monospace;
+    color: #2a4a1a;
+    padding-left: 20px;
+    margin-bottom: 4px;
+}
+
+/* Prompt section on main page */
+.main-card .settings-section {
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: 14px;
+}
+
+/* Steps indicator */
+#steps {
+    font-size: 12px;
+    font-family: 'Share Tech Mono', monospace;
+    color: #6a5a48;
+    padding: 0 20px;
+    min-height: 20px;
+}
+
+.step {
+    padding: 6px 10px;
+    background: #d0c0a8;
+    border-left: 3px solid #8a7560;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: #4a3a28;
+}
+
+/* Result area */
+#result:empty {
+    display: none;
+}
+
+#result {
+    margin: 0 20px 20px 20px;
+}
+
+.sql-editor {
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    font-size: 12px;
+    background: #1d1f21;
+    color: #c5c8c6;
+    border-top: 2px solid #8a7560;
+    border-left: 2px solid #8a7560;
+    border-right: 2px solid #f0e4d0;
+    border-bottom: 2px solid #f0e4d0;
+    padding: 12px 14px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-height: 160px;
+    max-height: 50vh;
+    resize: vertical;
+    outline: none;
+    line-height: 1.5;
+    white-space: pre;
+    overflow: auto;
+}
+
+.sql-editor:focus {
+    border-top-color: #6b8a60;
+    border-left-color: #6b8a60;
+}
+
+.detail-sql {
+    font-family: 'Share Tech Mono', 'Courier New', monospace !important;
+    font-size: 12px !important;
+    border-top: 2px solid #8a7560;
+    border-left: 2px solid #8a7560;
+    border-right: 2px solid #f0e4d0;
+    border-bottom: 2px solid #f0e4d0;
+    padding: 12px 14px !important;
+    white-space: pre-wrap !important;
+    word-break: break-all;
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 40px;
+    max-height: 50vh;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0 !important;
+}

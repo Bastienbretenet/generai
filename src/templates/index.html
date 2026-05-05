@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GenerAI</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
+        integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
+        crossorigin="anonymous"></script>
+    <script>
+        async function generate() {
+            const value = document.getElementById("value").value;
+            const hashMethod = document.getElementById("hash_method").value;
+            const steps = document.getElementById("steps");
+            const result = document.getElementById("result");
+
+            steps.innerHTML = "";
+            result.innerHTML = "";
+
+            const response = await fetch("/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({ value, hash_method: hashMethod })
+            });
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+
+            while (true) {
+                const { done, value: chunk } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(chunk, { stream: true });
+                const lines = buffer.split("\n");
+                buffer = lines.pop();
+                for (const line of lines) {
+                    if (!line.startsWith("data: ")) continue;
+                    const data = line.slice(6);
+                    if (data.startsWith("DONE:")) {
+                        steps.innerHTML = "";
+                        const b64 = data.slice(5);
+                        const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+                        result.innerHTML = new TextDecoder("utf-8").decode(bytes);
+                        htmx.process(result);
+                    } else {
+                        steps.innerHTML = `<div class="step">${data}</div>`;
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js"></script>
+</head>
+<body>
+    <div class="main-card">
+        <div class="main-header">
+            <h2 class="settings-title">[ GenerAI ]</h2>
+            <div style="display:flex;gap:6px;">
+                <a class="back-link" href="/history">&#9632; History</a>
+                <a class="back-link" href="/settings">&#9881; Settings</a>
+            </div>
+        </div>
+
+        {% if not has_api_key %}
+            <div class="notice">
+                &gt; Aucune clé API configurée. <a href="/settings">Ajouter une clé dans Settings →</a>
+            </div>
+        {% else %}
+            <div class="recap">
+                <div class="recap-item">
+                    <span class="recap-label">Hash</span>
+                    <span class="recap-value">{{ hash_method }}</span>
+                </div>
+                <div class="recap-item">
+                    <span class="recap-label">{{ active_provider.label }}</span>
+                    <span class="recap-value">{{ active_provider.model_label }}</span>
+                </div>
+                <div id="db-status"
+                    hx-get="/settings/test-db?badge=true"
+                    hx-trigger="load"
+                    hx-swap="outerHTML"
+                ></div>
+            </div>
+        {% endif %}
+
+        <section class="settings-section">
+            <label class="settings-label" for="project_context">_ Contexte du projet</label>
+            <textarea
+                name="project_context"
+                id="project_context"
+                placeholder="Décrivez le contexte de votre projet..."
+                rows="3"
+                hx-post="/save-context"
+                hx-trigger="change delay:500ms"
+                hx-include="#project_context"
+            >{{ project_context }}</textarea>
+        </section>
+
+        <section class="settings-section">
+            <label class="settings-label" for="value">_ Prompt</label>
+            <input type="text" name="value" id="value" placeholder="C:\> entrer une commande..." {% if not has_api_key %}disabled{% endif %} />
+        </section>
+
+        <input type="hidden" id="hash_method" value="{{ hash_method }}">
+        <button
+            onclick="generate()"
+            {% if not has_api_key %}disabled{% endif %}
+        >
+            &gt; Générer
+        </button>
+
+        <div id="steps"></div>
+        <div id="result"></div>
+    </div>
+</body>
+</html>

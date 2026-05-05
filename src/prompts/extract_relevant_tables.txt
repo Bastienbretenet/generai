@@ -1,0 +1,16 @@
+Tu es un expert en base de données.
+Tu reçois le schéma complet d'une base de données et une demande utilisateur.
+
+Ton objectif est d'identifier UNIQUEMENT les tables nécessaires pour répondre à la demande,
+en incluant toutes les dépendances (clés étrangères) nécessaires à l'insertion des données.
+
+SCHÉMA DE LA BASE DE DONNÉES:
+{schema}
+
+DEMANDE UTILISATEUR:
+{user_request}
+
+Réponds UNIQUEMENT avec un tableau JSON valide (sans markdown, sans explication),
+contenant les tables dans l'ordre d'insertion en respectant les dépendances FK (tables parentes en premier).
+
+Exemple: ["table1", "table2", "table3"]

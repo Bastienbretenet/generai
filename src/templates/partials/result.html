@@ -1,0 +1,14 @@
+<form id="apply-form">
+    <textarea id="sql-content" name="sql" class="sql-editor">{{ sql }}</textarea>
+    <input type="hidden" name="prompt" value="{{ prompt }}">
+    <input type="hidden" name="steps" value="{{ steps }}">
+    <button
+        type="button"
+        hx-post="/apply"
+        hx-target="#apply-result"
+        hx-include="#apply-form"
+    >
+        Appliquer
+    </button>
+</form>
+<div id="apply-result"></div>

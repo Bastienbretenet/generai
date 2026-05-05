@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GenerAI — Historique</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
+        integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js"></script>
+    <style>
+        body {
+            align-items: flex-start;
+            padding: 32px 16px;
+        }
+
+        .history-layout {
+            display: flex;
+            gap: 16px;
+            width: 960px;
+            max-width: 100%;
+            align-items: flex-start;
+        }
+
+        .history-list-card {
+            background: #e8dcc8;
+            border-top: 3px solid #f5ede0;
+            border-left: 3px solid #f5ede0;
+            border-right: 3px solid #8a7560;
+            border-bottom: 3px solid #8a7560;
+            box-shadow: 4px 4px 0 #6b5a48, 8px 8px 0 rgba(0,0,0,0.2);
+            width: 280px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-detail-card {
+            background: #e8dcc8;
+            border-top: 3px solid #f5ede0;
+            border-left: 3px solid #f5ede0;
+            border-right: 3px solid #8a7560;
+            border-bottom: 3px solid #8a7560;
+            box-shadow: 4px 4px 0 #6b5a48, 8px 8px 0 rgba(0,0,0,0.2);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-items {
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            gap: 6px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: block;
+            padding: 8px 10px;
+            background: #d8cbb8;
+            border-top: 2px solid #e4d8c4;
+            border-left: 2px solid #e4d8c4;
+            border-right: 2px solid #7a6a58;
+            border-bottom: 2px solid #7a6a58;
+            text-decoration: none;
+            cursor: pointer;
+            color: #2a1f14;
+        }
+
+        .history-item:hover {
+            background: #d0c0a8;
+        }
+
+        .history-item.active {
+            background: #c8b89a;
+            border-top: 2px solid #7a6a58;
+            border-left: 2px solid #7a6a58;
+            border-right: 2px solid #e4d8c4;
+            border-bottom: 2px solid #e4d8c4;
+        }
+
+        .history-item-prompt {
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-size: 12px;
+            color: #2a1f14;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item-date {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            color: #7a6a58;
+            margin-top: 3px;
+        }
+
+        .history-empty {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: #7a6a58;
+            padding: 16px 12px;
+            font-style: italic;
+        }
+
+        .detail-content {
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .detail-prompt {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            color: #2a1f14;
+            padding: 8px 12px;
+            background: #d8cbb8;
+            border-top: 2px solid #8a7560;
+            border-left: 2px solid #8a7560;
+            border-right: 2px solid #f0e4d0;
+            border-bottom: 2px solid #f0e4d0;
+        }
+
+        .detail-date {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: #7a6a58;
+        }
+
+        .detail-section-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: #5a4a38;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+        }
+
+        .detail-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-step {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: #4a3a28;
+            padding: 5px 10px;
+            background: #d0c0a8;
+            border-left: 3px solid #8a7560;
+        }
+
+.detail-placeholder {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: #7a6a58;
+            font-style: italic;
+            padding: 32px 20px;
+            text-align: center;
+        }
+
+        .apply-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .apply-result {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: #2a4a1a;
+        }
+
+        .detail-sql {
+            font-family: 'Share Tech Mono', 'Courier New', monospace !important;
+            font-size: 12px !important;
+            padding: 12px 14px !important;
+            white-space: pre-wrap !important;
+            word-break: break-all;
+            overflow-x: hidden;
+            overflow-y: auto;
+            min-height: 40px;
+            max-height: 50vh;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin: 0 !important;
+        }
+
+        .history-detail-card {
+            min-width: 0;
+        }
+
+        .detail-content {
+            min-width: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="history-layout">
+        <!-- Liste -->
+        <div class="history-list-card">
+            <div class="main-header">
+                <h2 class="settings-title">[ HISTORIQUE ]</h2>
+                <a class="back-link" href="/">&#8592; Back</a>
+            </div>
+            <div class="history-items">
+                {% if items %}
+                    {% for item in items %}
+                        <a class="history-item {% if selected and selected.id == item.id %}active{% endif %}"
+                           href="/history/{{ item.id }}">
+                            <div class="history-item-prompt">&gt; {{ item.prompt }}</div>
+                            <div class="history-item-date">{{ item.created_at }}</div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="history-empty">Aucun historique.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Détail -->
+        <div class="history-detail-card">
+            <div class="main-header">
+                <h2 class="settings-title">[ DETAIL ]</h2>
+            </div>
+            {% if selected %}
+                <div class="detail-content">
+                    <div>
+                        <div class="detail-section-label">_ Prompt</div>
+                        <div class="detail-prompt">&gt; {{ selected.prompt }}</div>
+                        <div class="detail-date">{{ selected.created_at }}</div>
+                    </div>
+
+                    <div>
+                        <div class="detail-section-label">_ Étapes</div>
+                        <div class="detail-steps">
+                            {% for step in selected.steps %}
+                                <div class="detail-step">{{ step }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if selected.sql %}
+                        <div>
+                            <div class="detail-section-label">_ SQL appliqué</div>
+                            <pre class="detail-sql"><code class="language-sql">{{ selected.sql }}</code></pre>
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="detail-placeholder">
+                    &lt; Sélectionner une entrée dans la liste &gt;
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
