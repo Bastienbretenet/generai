@@ -5,12 +5,17 @@ Génère des fixtures SQL réalistes sous forme d'INSERTs valides et cohérents,
 en respectant l'ordre des dépendances FK.
 Attention, si les ID sont de types UUID, génére uniquement un code 'uuid1', 'uuid2' tout en gardant les bonnes relations si necessaire.
 Idem pour les password, ajoute uniquement le mot "{{password}}"...
+Pour les colonnes de type entier avec "primary_key: true", le champ "current_max_id" indique la valeur MAX actuelle en base.
+Tu DOIS commencer tes IDs à partir de current_max_id + 1 pour éviter les conflits. Si current_max_id est null, commence à 1.
 
 SCHÉMA DES TABLES:
 {schema}
 
 CONTEXTE DU PROJET:
 {project_context}
+
+TABLES PROTÉGÉES (données existantes — NE PAS générer d'INSERT pour ces tables, utiliser uniquement leurs IDs pour les FK):
+{protected_data}
 
 DEMANDE UTILISATEUR:
 {user_request}

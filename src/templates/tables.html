@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GenerAI — Tables</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
+        integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+    <div class="settings-card">
+        <div class="main-header">
+            <h2 class="settings-title">[ TABLES ]</h2>
+            <a class="back-link" href="/">&#8592; Back</a>
+        </div>
+
+        {% if tables %}
+            <section class="settings-section">
+                <label class="settings-label">Tables protégées</label>
+                <p class="settings-hint" style="margin: 0 0 12px;">
+                    Les tables cochées ne recevront jamais d'INSERT — le LLM utilisera leurs IDs existants pour les FK.
+                </p>
+                <div class="provider-card">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        {% for table in tables %}
+                            <label style="display: flex; align-items: center; gap: 10px; font-family: 'Share Tech Mono', monospace; font-size: 13px; cursor: pointer;">
+                                <input type="checkbox"
+                                    name="protected_tables"
+                                    value="{{ table }}"
+                                    id="table_{{ table }}"
+                                    {% if table in protected %}checked{% endif %}>
+                                {{ table }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <button
+                hx-post="/tables/save"
+                hx-target="#save-result"
+                hx-include="input[type=checkbox]"
+            >
+                &gt; Save
+            </button>
+            <div id="save-result"></div>
+
+        {% else %}
+            <div class="notice">
+                &gt; Impossible de récupérer les tables. Vérifiez la connexion à la base de données dans <a href="/settings">Settings →</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -6,19 +6,17 @@
         integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
         crossorigin="anonymous"></script>
     <script>
-        async function generate() {
-            const value = document.getElementById("value").value;
-            const hashMethod = document.getElementById("hash_method").value;
+        async function streamToResult(url, body) {
             const steps = document.getElementById("steps");
             const result = document.getElementById("result");
 
             steps.innerHTML = "";
             result.innerHTML = "";
 
-            const response = await fetch("/ask", {
+            const response = await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams({ value, hash_method: hashMethod })
+                body: new URLSearchParams(body)
             });
 
             const reader = response.body.getReader();
@@ -46,6 +44,18 @@
                 }
             }
         }
+
+        function generate() {
+            const value = document.getElementById("value").value;
+            const hashMethod = document.getElementById("hash_method").value;
+            streamToResult("/ask", { value, hash_method: hashMethod });
+        }
+
+        function fixSQL() {
+            const form = document.getElementById("fix-form");
+            const data = Object.fromEntries(new FormData(form).entries());
+            streamToResult("/fix", data);
+        }
     </script>
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
@@ -58,6 +68,7 @@
             <h2 class="settings-title">[ GenerAI ]</h2>
             <div style="display:flex;gap:6px;">
                 <a class="back-link" href="/history">&#9632; History</a>
+                <a class="back-link" href="/tables">&#9776; Tables</a>
                 <a class="back-link" href="/settings">&#9881; Settings</a>
             </div>
         </div>
@@ -99,7 +110,7 @@
 
         <section class="settings-section">
             <label class="settings-label" for="value">_ Prompt</label>
-            <input type="text" name="value" id="value" placeholder="C:\> entrer une commande..." {% if not has_api_key %}disabled{% endif %} />
+            <textarea name="value" id="value" placeholder="C:\> entrer une commande..." {% if not has_api_key %}disabled{% endif %} rows="4"></textarea>
         </section>
 
         <input type="hidden" id="hash_method" value="{{ hash_method }}">

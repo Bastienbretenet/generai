@@ -11,3 +11,4 @@ wheels/
 .env.local
 src/data/config.db
 projet.md
+.claude

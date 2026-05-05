@@ -26,6 +26,26 @@ def apply_sql(sql: str) -> None:
                 conn.execute(text(statement))
 
 
+def get_protected_table_ids(protected_tables: list[str]) -> dict:
+    """Fetch existing PKs from protected tables so the LLM can reference them in FK."""
+    if not protected_tables:
+        return {}
+    engine = get_engine()
+    db_type = get_setting("db_type", "postgresql")
+    result = {}
+    with engine.connect() as conn:
+        for table in protected_tables:
+            try:
+                if db_type == "mysql":
+                    row = conn.execute(text(f"SELECT * FROM `{table}` LIMIT 10")).fetchall()
+                else:
+                    row = conn.execute(text(f'SELECT * FROM "{table}" LIMIT 10')).fetchall()
+                result[table] = [dict(r._mapping) for r in row]
+            except Exception:
+                pass
+    return result
+
+
 def get_schema():
     db_type = get_setting("db_type", "postgresql")
     engine = get_engine()
@@ -68,7 +88,24 @@ def _get_schema_postgresql(engine):
             AND tc.table_schema = 'public'
         """)).fetchall()
 
-    return _build_tables(columns, primary_keys, foreign_keys)
+        pk_max_ids = _fetch_pk_max_ids(conn, primary_keys, "postgresql")
+
+    return _build_tables(columns, primary_keys, foreign_keys, pk_max_ids)
+
+
+def _fetch_pk_max_ids(conn, primary_keys: list, db_type: str = "postgresql") -> dict:
+    max_ids = {}
+    for table, column in primary_keys:
+        try:
+            if db_type == "mysql":
+                row = conn.execute(text(f"SELECT MAX(`{column}`) FROM `{table}`")).fetchone()
+            else:
+                row = conn.execute(text(f'SELECT MAX("{column}") FROM "{table}"')).fetchone()
+            val = row[0]
+            max_ids[(table, column)] = val.hex() if isinstance(val, (bytes, bytearray)) else val
+        except Exception:
+            pass
+    return max_ids
 
 
 def _get_schema_mysql(engine):
@@ -103,10 +140,12 @@ def _get_schema_mysql(engine):
             AND kcu.referenced_table_name IS NOT NULL
         """), {"db": db_name}).fetchall()
 
-    return _build_tables(columns, primary_keys, foreign_keys)
+        pk_max_ids = _fetch_pk_max_ids(conn, primary_keys, "mysql")
+
+    return _build_tables(columns, primary_keys, foreign_keys, pk_max_ids)
 
 
-def _build_tables(columns, primary_keys, foreign_keys) -> dict:
+def _build_tables(columns, primary_keys, foreign_keys, pk_max_ids: dict | None = None) -> dict:
     pks = {(t, c) for t, c in primary_keys}
     fks = {}
     for table, column, ftable, fcolumn in foreign_keys:
@@ -116,11 +155,13 @@ def _build_tables(columns, primary_keys, foreign_keys) -> dict:
     for table, column, dtype, nullable, max_length in columns:
         if table not in tables:
             tables[table] = {"columns": [], "foreign_keys": []}
+        is_pk = (table, column) in pks
         tables[table]["columns"].append({
             "column": column,
             "type": dtype,
             "nullable": nullable == "YES",
-            "primary_key": (table, column) in pks,
+            "primary_key": is_pk,
+            "current_max_id": (pk_max_ids or {}).get((table, column)) if is_pk else None,
             "foreign_key": fks.get((table, column)),
             "max_length": max_length
         })

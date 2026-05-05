@@ -175,10 +175,14 @@ textarea {
 
 input[type="text"]:focus,
 input[type="password"]:focus,
-textarea:focus {
+textarea:not(.sql-editor):focus {
     outline: 1px dotted #4a3d30;
     outline-offset: 1px;
     background: #e0d4c0;
+}
+
+textarea.sql-editor:focus {
+    background: #1d1f21;
 }
 
 textarea::placeholder {

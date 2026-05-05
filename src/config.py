@@ -45,4 +45,28 @@ API_PROVIDERS = {
             "gpt-5.5": "GPT-5.5 (qualité maximale)",
         }
     },
+    "Mistral": {
+        "label": "Mistral AI",
+        "name": "mistral",
+        "placeholder": "...",
+        "lien": "https://console.mistral.ai/",
+        "models": {
+            "mistral-small-latest": "Mistral Small (rapide, économique)",
+            "mistral-medium-latest": "Mistral Medium (équilibré)",
+            "mistral-large-latest": "Mistral Large (qualité maximale)",
+            "codestral-latest": "Codestral (spécialisé code)",
+        }
+    },
+    "OpenRouter": {
+        "label": "OpenRouter",
+        "name": "openrouter",
+        "placeholder": "sk-or-v1-...",
+        "lien": "https://openrouter.ai/",
+        "models": {
+            "meta-llama/llama-3.3-70b-instruct": "Llama 3.3 70B (économique)",
+            "google/gemini-2.0-flash-001": "Gemini 2.0 Flash (rapide)",
+            "deepseek/deepseek-chat-v3-0324": "DeepSeek V3 (équilibré)",
+            "anthropic/claude-sonnet-4-6": "Claude Sonnet via OpenRouter",
+        }
+    },
 }
